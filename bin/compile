@@ -1,12 +1,14 @@
 #!/bin/bash
 
+BUILD_DIR=$1
+
 indent() {
     sed -u 's/^/       /'
 }
 
 echo "-----> Found a .terraform_url file"
 
-if [ ! -s $1/.terraform_url ]; then
+if [ ! -s $BUILD_DIR/.terraform_url ]; then
     echo ".terraform_url empty. Skipping." | indent
     exit 0
 fi
@@ -17,12 +19,14 @@ if [ $STACK == "cedar" ]; then
   UNZIP_COMMAND="jar xf"
 fi
 
-cd $1
+mkdir -p $BUILD_DIR/bin
 
-while read url; do
-  if [ -n "$url" ]; then
-    echo Vendoring $url | indent
-    curl -L --silent $url > $1/bin/terraform.zip
-    cd $1/bin && $UNZIP_COMMAND terraform.zip && rm terraform.zip
-  fi
-done < .terraform_url
+while IFS='' read -r url || [[ -n "$url" ]]; do
+  echo "Installing Terraform..." | indent
+  curl -L --silent $url > $BUILD_DIR/bin/terraform.zip
+done < $BUILD_DIR/.terraform_url 
+
+$UNZIP_COMMAND $BUILD_DIR/bin/terraform.zip
+mv terraform $BUILD_DIR/bin/terraform
+rm $BUILD_DIR/bin/terraform.zip
+echo "Done." | indent
