@@ -28,7 +28,7 @@ done < $BUILD_DIR/.terraform_url
 
 $UNZIP_COMMAND $BUILD_DIR/bin/terraform.zip
 mv terraform $BUILD_DIR/bin/terraform
-sudo chmod +x $BUILD_DIR/bin/terraform
+chmod +x $BUILD_DIR/bin/terraform
 rm $BUILD_DIR/bin/terraform.zip
 export PATH="/app/bin:$PATH"
 echo "Done." | indent
